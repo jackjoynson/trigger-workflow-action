@@ -1,0 +1,39 @@
+name: 'trigger-workflow-action'
+description: 'Github action to trigger another workflow'
+inputs:
+  workflow:
+    description: 'The workflow id or file name'
+    required: true
+  token:
+    description: 'The github token with permissions to trigger the workflow'
+    required: true
+  repository:
+    description: 'The repository to trigger the workflow in'
+    default: ${{ github.repository }}
+    required: true
+  ref:
+    description: 'The branch, tag or SHA to run the triggered workflow from'
+    default: ${{ github.ref }}
+    required: true
+  inputs:
+    description: 'The inputs to pass to the triggered workflow'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - name: 'Trigger workflow without inputs'
+      if: ${{ inputs.inputs == '' }}
+      run: |
+        curl -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${{ inputs.token }}" \
+          https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ inputs.workflow }}/dispatches \
+          -d '{"ref": "${{ inputs.ref }}"}'
+    - name: 'Trigger workflow with inputs'
+      if: ${{ inputs.inputs != '' }}
+      run: |
+        curl -X POST \
+          -H "Accept: application/vnd.github.v3+json" \
+          -H "Authorization: token ${{ inputs.token }}" \
+          https://api.github.com/repos/${{ github.repository }}/actions/workflows/${{ inputs.workflow }}/dispatches \
+          -d '{"ref": "${{ inputs.ref }}", "inputs": "${{ inputs.inputs }}"}'
