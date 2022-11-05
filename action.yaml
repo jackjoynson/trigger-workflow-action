@@ -23,6 +23,7 @@ runs:
   steps:
     - name: 'Trigger workflow without inputs'
       if: ${{ inputs.inputs == '' }}
+      shell: bash
       run: |
         curl -X POST \
           -H "Accept: application/vnd.github.v3+json" \
@@ -31,6 +32,7 @@ runs:
           -d '{"ref": "${{ inputs.ref }}"}'
     - name: 'Trigger workflow with inputs'
       if: ${{ inputs.inputs != '' }}
+      shell: bash
       run: |
         curl -X POST \
           -H "Accept: application/vnd.github.v3+json" \
